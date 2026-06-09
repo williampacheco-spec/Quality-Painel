@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quality Investigator — Painel Top 3</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Special+Elite&family=Exo+2:wght@300;400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0a0a0a;color:#fff;font-family:'Exo 2',sans-serif;min-height:100vh;overflow:hidden;}
+
+/* BG animado */
+.bg{position:fixed;inset:0;z-index:0;}
+.bg canvas{width:100%;height:100%;}
+
+/* Partículas de estrela */
+@keyframes float{0%,100%{transform:translateY(0px) rotate(0deg);opacity:1}50%{transform:translateY(-20px) rotate(180deg);opacity:.5}}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.05);opacity:1}}
+@keyframes slideIn{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow{0%,100%{text-shadow:0 0 20px currentColor,0 0 40px currentColor}50%{text-shadow:0 0 40px currentColor,0 0 80px currentColor,0 0 120px currentColor}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes confetti{0%{transform:translateY(-100vh) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+@keyframes countup{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes zoomIn{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
+@keyframes rankReveal{from{opacity:0;transform:translateX(-100px)}to{opacity:1;transform:translateX(0)}}
+
+#app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
+
+/* LOADING */
+#loading{text-align:center;}
+.loader-ring{width:80px;height:80px;border:4px solid rgba(255,255,255,.1);border-top:4px solid #ffd700;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 24px;}
+.loader-text{font-family:'Orbitron',monospace;font-size:14px;color:#ffd700;letter-spacing:3px;}
+
+/* HEADER */
+.header{text-align:center;margin-bottom:32px;animation:slideIn .8s ease;}
+.header-badge{font-family:'Special Elite',serif;font-size:11px;letter-spacing:5px;color:#ffd700;border:1px solid rgba(255,215,0,.4);padding:5px 18px;border-radius:1px;margin-bottom:16px;display:inline-block;}
+.header-title{font-family:'Orbitron',monospace;font-size:clamp(24px,5vw,52px);font-weight:900;color:#fff;line-height:1.1;animation:glow 3s ease-in-out infinite;}
+.header-title span{color:#ffd700;}
+.header-sub{font-family:'Exo 2',sans-serif;font-size:clamp(12px,2vw,18px);color:rgba(255,255,255,.5);letter-spacing:3px;margin-top:8px;}
+
+/* PODIUM */
+.podium-wrap{display:flex;align-items:flex-end;justify-content:center;gap:16px;margin-bottom:32px;width:100%;max-width:1000px;}
+
+.podium-card{display:flex;flex-direction:column;align-items:center;position:relative;}
+
+/* 1º lugar */
+.podium-card.p1 .podium-block{height:200px;width:260px;background:linear-gradient(180deg,rgba(255,215,0,.25) 0%,rgba(255,215,0,.08) 100%);border:2px solid #ffd700;border-bottom:none;box-shadow:0 0 40px rgba(255,215,0,.3),inset 0 1px 0 rgba(255,215,0,.2);}
+.podium-card.p2 .podium-block{height:150px;width:220px;background:linear-gradient(180deg,rgba(192,192,192,.2) 0%,rgba(192,192,192,.06) 100%);border:2px solid #c0c0c0;border-bottom:none;box-shadow:0 0 25px rgba(192,192,192,.2);}
+.podium-card.p3 .podium-block{height:110px;width:200px;background:linear-gradient(180deg,rgba(205,127,50,.2) 0%,rgba(205,127,50,.06) 100%);border:2px solid #cd7f32;border-bottom:none;box-shadow:0 0 20px rgba(205,127,50,.2);}
+
+.podium-block{display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:clamp(28px,4vw,48px);font-weight:900;}
+.podium-card.p1 .podium-block{font-size:clamp(36px,5vw,64px);}
+
+.player-card{padding:16px;text-align:center;width:100%;}
+.player-card.p1{animation:bounce 2s ease-in-out infinite;}
+
+.player-trophy{font-size:clamp(28px,4vw,48px);margin-bottom:8px;display:block;}
+.player-card.p1 .player-trophy{font-size:clamp(36px,5vw,64px);}
+
+.player-name{font-family:'Orbitron',monospace;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px;}
+.player-card.p1 .player-name{font-size:clamp(14px,2vw,22px);color:#ffd700;animation:glow 2s ease-in-out infinite;}
+.player-card.p2 .player-name{font-size:clamp(12px,1.6vw,18px);color:#c0c0c0;}
+.player-card.p3 .player-name{font-size:clamp(11px,1.4vw,16px);color:#cd7f32;}
+
+.player-district{font-size:clamp(9px,1.2vw,13px);color:rgba(255,255,255,.4);letter-spacing:2px;margin-bottom:8px;font-family:'Special Elite',serif;}
+
+.player-stats{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.stat-chip{font-family:'Orbitron',monospace;font-size:clamp(8px,1vw,11px);padding:4px 10px;border-radius:2px;letter-spacing:1px;}
+.p1 .stat-chip.xp{background:rgba(255,215,0,.15);border:1px solid rgba(255,215,0,.4);color:#ffd700;}
+.p1 .stat-chip.time{background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.3);color:#00ff88;}
+.p1 .stat-chip.acc{background:rgba(0,200,255,.1);border:1px solid rgba(0,200,255,.3);color:#00c8ff;}
+.p2 .stat-chip.xp{background:rgba(192,192,192,.1);border:1px solid rgba(192,192,192,.3);color:#c0c0c0;}
+.p2 .stat-chip.time{background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);color:#00ff88;}
+.p2 .stat-chip.acc{background:rgba(0,200,255,.08);border:1px solid rgba(0,200,255,.2);color:#00c8ff;}
+.p3 .stat-chip.xp{background:rgba(205,127,50,.1);border:1px solid rgba(205,127,50,.3);color:#cd7f32;}
+.p3 .stat-chip.time{background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.15);color:#00ff88;}
+.p3 .stat-chip.acc{background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.15);color:#00c8ff;}
+
+/* BASE DO PÓDIO */
+.podium-base{width:100%;max-width:1000px;height:16px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.3),rgba(255,215,0,.6),rgba(255,215,0,.3),transparent);margin-bottom:24px;box-shadow:0 0 20px rgba(255,215,0,.3);}
+
+/* TABELA COMPLETA */
+.full-table{width:100%;max-width:900px;animation:slideIn 1s ease .5s both;}
+.table-title{font-family:'Special Elite',serif;font-size:11px;color:rgba(255,255,255,.4);letter-spacing:4px;text-align:center;margin-bottom:12px;}
+.table-row{display:grid;grid-template-columns:40px 1fr 100px 80px 80px 90px;gap:12px;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.05);font-size:clamp(10px,1.4vw,14px);transition:background .2s;}
+.table-row:hover{background:rgba(255,255,255,.03);}
+.table-row.header-row{font-family:'Orbitron',monospace;font-size:9px;color:rgba(255,255,255,.3);letter-spacing:2px;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:8px;}
+.rank-num{font-family:'Orbitron',monospace;font-weight:700;text-align:center;}
+.row-email{color:rgba(255,255,255,.8);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.row-district{color:rgba(255,255,255,.4);font-size:.85em;}
+.row-xp{color:#ffd700;font-family:'Orbitron',monospace;text-align:right;}
+.row-acc{color:#00c8ff;text-align:right;}
+.row-time{color:#00ff88;font-family:'Orbitron',monospace;text-align:right;}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 20px;}
+.empty-icon{font-size:64px;margin-bottom:16px;opacity:.3;}
+.empty-text{font-family:'Orbitron',monospace;font-size:14px;color:rgba(255,255,255,.3);letter-spacing:2px;}
+.empty-sub{font-size:12px;color:rgba(255,255,255,.2);margin-top:8px;}
+
+/* REFRESH */
+.refresh-bar{position:fixed;bottom:20px;right:20px;display:flex;align-items:center;gap:10px;}
+.refresh-btn{font-family:'Orbitron',monospace;font-size:9px;padding:8px 16px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);color:#ffd700;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .2s;}
+.refresh-btn:hover{background:rgba(255,215,0,.2);}
+.auto-refresh{font-size:9px;color:rgba(255,255,255,.3);font-family:'Orbitron',monospace;}
+.refresh-dot{width:6px;height:6px;border-radius:50%;background:#00ff88;animation:pulse 2s infinite;}
+
+/* CONFETTI */
+.confetti-piece{position:fixed;width:10px;height:10px;top:-20px;animation:confetti 4s linear infinite;z-index:999;pointer-events:none;border-radius:2px;}
+
+/* NO DATA */
+.waiting{text-align:center;animation:fadeIn 1s ease;}
+.waiting-title{font-family:'Orbitron',monospace;font-size:clamp(16px,3vw,28px);color:#ffd700;margin-bottom:16px;animation:glow 2s infinite;}
+.waiting-sub{font-size:14px;color:rgba(255,255,255,.4);letter-spacing:2px;}
+
+/* CROWN */
+.crown{position:absolute;top:-40px;left:50%;transform:translateX(-50%);font-size:36px;animation:bounce 1.5s ease-in-out infinite;}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div id="loading">
+    <div class="loader-ring"></div>
+    <div class="loader-text">CARREGANDO RESULTADOS...</div>
+  </div>
+</div>
+
+<div class="refresh-bar">
+  <div class="refresh-dot"></div>
+  <div class="auto-refresh" id="refresh-timer">AUTO: 30s</div>
+  <button class="refresh-btn" onclick="loadData()">↺ ATUALIZAR</button>
+</div>
+
+<script>
+const SHEETS_URL = "https://script.google.com/macros/s/AKfycbwGkSJo6qXv_2JaBK_bEc9J0WqUFL8AEtfY7IvUe01M3IOAX9OD0H5gg8tTO7JAlO7Huw/exec";
+
+// Partículas de fundo
+const canvas = document.createElement('canvas');
+const bgDiv = document.createElement('div');
+bgDiv.className = 'bg';
+bgDiv.appendChild(canvas);
+document.body.insertBefore(bgDiv, document.body.firstChild);
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+
+const particles = Array.from({length: 80}, () => ({
+  x: Math.random() * canvas.width,
+  y: Math.random() * canvas.height,
+  size: Math.random() * 2 + .5,
+  speedX: (Math.random() - .5) * .3,
+  speedY: (Math.random() - .5) * .3,
+  opacity: Math.random() * .5 + .1,
+}));
+
+function drawBG() {
+  ctx.fillStyle = '#0a0a0a';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // Grid
+  ctx.strokeStyle = 'rgba(255,215,0,0.03)';
+  ctx.lineWidth = 1;
+  for(let x = 0; x < canvas.width; x += 60) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
+  for(let y = 0; y < canvas.height; y += 60) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
+  // Particles
+  particles.forEach(p => {
+    p.x += p.speedX; p.y += p.speedY;
+    if(p.x < 0) p.x = canvas.width; if(p.x > canvas.width) p.x = 0;
+    if(p.y < 0) p.y = canvas.height; if(p.y > canvas.height) p.y = 0;
+    ctx.fillStyle = `rgba(255,215,0,${p.opacity})`;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
+  });
+  requestAnimationFrame(drawBG);
+}
+drawBG();
+
+// Confetti
+function spawnConfetti() {
+  const colors = ['#ffd700','#ff4444','#00ff88','#00d4ff','#ff8800','#ff44ff'];
+  for(let i = 0; i < 30; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = `left:${Math.random()*100}vw;background:${colors[Math.floor(Math.random()*colors.length)]};animation-delay:${Math.random()*3}s;animation-duration:${3+Math.random()*3}s;width:${6+Math.random()*10}px;height:${6+Math.random()*10}px;`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 6000);
+  }
+}
+
+// Auto refresh
+let countdown = 30;
+setInterval(() => {
+  countdown--;
+  document.getElementById('refresh-timer').textContent = `AUTO: ${countdown}s`;
+  if(countdown <= 0) { countdown = 30; loadData(); }
+}, 1000);
+
+function formatTime(secs) {
+  if(!secs && secs !== 0) return '--';
+  const m = Math.floor(secs/60), s = secs%60;
+  return `${m}m${String(s).padStart(2,'0')}s`;
+}
+
+function getEmailName(email) {
+  if(!email) return 'Analista';
+  return email.split('@')[0].replace(/\./g,' ').toUpperCase();
+}
+
+async function loadData() {
+  try {
+    const res = await fetch(SHEETS_URL + '?action=get&t=' + Date.now());
+    const data = await res.json();
+    if(data && data.rows) renderPanel(data.rows);
+    else renderEmpty();
+  } catch(e) {
+    console.warn('Erro:', e);
+    renderEmpty();
+  }
+}
+
+function renderEmpty() {
+  document.getElementById('app').innerHTML = `
+    <div class="header" style="animation:slideIn .8s ease;">
+      <div class="header-badge">PACK QUALITY · INVOPS BRASIL</div>
+      <div class="header-title">QUALITY<br/><span>INVESTIGATOR</span></div>
+      <div class="header-sub">PAINEL DE RESULTADOS</div>
+    </div>
+    <div class="waiting">
+      <div style="font-size:80px;margin-bottom:16px;">⏳</div>
+      <div class="waiting-title">AGUARDANDO JOGADORES...</div>
+      <div class="waiting-sub">Os resultados aparecerão aqui assim que os analistas finalizarem o jogo</div>
+      <div style="margin-top:24px;font-family:'Orbitron',monospace;font-size:10px;color:rgba(255,255,255,.2);">ATUALIZAÇÃO AUTOMÁTICA A CADA 30 SEGUNDOS</div>
+    </div>
+  `;
+}
+
+function renderPanel(rows) {
+  // rows = array de objetos com os dados
+  // Ordenar: mais acertos primeiro, em caso de empate menor tempo
+  const sorted = [...rows].sort((a, b) => {
+    const accA = parseFloat(a.pct) || 0;
+    const accB = parseFloat(b.pct) || 0;
+    if(accB !== accA) return accB - accA;
+    return (parseInt(a.timeSeconds)||9999) - (parseInt(b.timeSeconds)||9999);
+  });
+
+  const top3 = sorted.slice(0, 3);
+  const rest = sorted.slice(3);
+  const medals = ['🥇','🥈','🥉'];
+  const colors = ['p1','p2','p3'];
+  const trophies = ['👑','🥈','🥉'];
+  const podiumOrder = top3.length >= 2 ? [
+    top3[1] ? {player: top3[1], rank: 1, cls:'p2'} : null,
+    top3[0] ? {player: top3[0], rank: 0, cls:'p1'} : null,
+    top3[2] ? {player: top3[2], rank: 2, cls:'p3'} : null,
+  ].filter(Boolean) : top3.map((p,i)=>({player:p,rank:i,cls:colors[i]}));
+
+  if(top3.length > 0) spawnConfetti();
+
+  const podiumHTML = podiumOrder.map(({player, rank, cls}) => `
+    <div class="podium-card ${cls}" style="animation:rankReveal ${.3+rank*.2}s ease both;">
+      <div class="player-card ${cls}">
+        ${rank===0?'<div class="crown">👑</div>':''}
+        <div class="player-trophy">${medals[rank]}</div>
+        <div class="player-name">${getEmailName(player.email)}</div>
+        <div class="player-district">${(player.district||'').toUpperCase()}</div>
+        <div class="player-stats">
+          <div class="stat-chip xp">⚡ ${player.xp||0} XP</div>
+          <div class="stat-chip acc">🎯 ${player.pct||'0%'}</div>
+          <div class="stat-chip time">⏱ ${formatTime(parseInt(player.timeSeconds))}</div>
+        </div>
+      </div>
+      <div class="podium-block">${rank+1}º</div>
+    </div>
+  `).join('');
+
+  const tableRows = sorted.map((p, i) => `
+    <div class="table-row" style="animation:fadeIn ${.1*i}s ease both;">
+      <div class="rank-num" style="color:${i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'rgba(255,255,255,.3)'}">${i<3?medals[i]:i+1}</div>
+      <div>
+        <div class="row-email">${getEmailName(p.email)}</div>
+        <div class="row-district">${p.email||''}</div>
+      </div>
+      <div class="row-district" style="color:rgba(255,255,255,.4);font-size:.8em;">${p.district||''}</div>
+      <div class="row-xp">${p.xp||0}</div>
+      <div class="row-acc">${p.pct||'0%'}</div>
+      <div class="row-time">${formatTime(parseInt(p.timeSeconds))}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('app').innerHTML = `
+    <div class="header">
+      <div class="header-badge">PACK QUALITY · INVOPS BRASIL</div>
+      <div class="header-title">QUALITY <span>INVESTIGATOR</span></div>
+      <div class="header-sub">🏆 TOP INVESTIGADORES — ${sorted.length} ANALISTA${sorted.length!==1?'S':''}</div>
+    </div>
+
+    <div class="podium-wrap">${podiumHTML}</div>
+    <div class="podium-base"></div>
+
+    ${sorted.length > 3 ? `
+    <div class="full-table">
+      <div class="table-title">— RANKING COMPLETO —</div>
+      <div class="table-row header-row">
+        <div>#</div><div>ANALISTA</div><div>DISTRITO</div>
+        <div style="text-align:right">XP</div>
+        <div style="text-align:right">ACERTOS</div>
+        <div style="text-align:right">TEMPO</div>
+      </div>
+      ${tableRows}
+    </div>` : ''}
+  `;
+}
+
+// Inicializar
+loadData();
+</script>
+
+<!-- Apps Script atualizado — cole este código no seu Apps Script -->
+<!--
+ATUALIZE SEU APPS SCRIPT COM ESTE CÓDIGO:
+
+function doPost(e) {
+  try {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    const data = JSON.parse(e.postData.contents);
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(['Data/Hora','Email','Distrito','XP Total','Acertos','Total Perguntas','Aproveitamento %','Tempo (seg)','Tempo Formatado','Trouxe Pista?','pct_num']);
+      sheet.getRange(1,1,1,11).setFontWeight('bold').setBackground('#c9a227').setFontColor('#000');
+    }
+    const mins = Math.floor(data.timeSeconds/60), secs = data.timeSeconds%60;
+    sheet.appendRow([new Date().toLocaleString('pt-BR'),data.email,data.district,data.xp,data.totalCorrect,data.totalAnswered,data.pct+'%',data.timeSeconds,mins+'m '+String(secs).padStart(2,'0')+'s',data.hasPista?'Sim':'Não',data.pct]);
+    return ContentService.createTextOutput(JSON.stringify({success:true})).setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({success:false,error:err.message})).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const data = sheet.getDataRange().getValues();
+  if (data.length <= 1) return ContentService.createTextOutput(JSON.stringify({rows:[]})).setMimeType(ContentService.MimeType.JSON);
+  const headers = data[0];
+  const rows = data.slice(1).map(row => {
+    const obj = {};
+    headers.forEach((h,i) => obj[h] = row[i]);
+    return {
+      email: obj['Email'] || '',
+      district: obj['Distrito'] || '',
+      xp: obj['XP Total'] || 0,
+      totalCorrect: obj['Acertos'] || 0,
+      totalAnswered: obj['Total Perguntas'] || 0,
+      pct: obj['Aproveitamento %'] || '0%',
+      timeSeconds: obj['Tempo (seg)'] || 0,
+      hasPista: obj['Trouxe Pista?'] === 'Sim',
+    };
+  });
+  return ContentService.createTextOutput(JSON.stringify({rows})).setMimeType(ContentService.MimeType.JSON);
+}
+-->
+</body>
+</html>
