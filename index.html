@@ -3,363 +3,286 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quality Investigator — Painel Top 3</title>
+<title>Quality Investigator — Top 3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Special+Elite&family=Exo+2:wght@300;400;600;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:#0a0a0a;color:#fff;font-family:'Exo 2',sans-serif;min-height:100vh;overflow:hidden;}
+html,body{width:100%;height:100%;background:#0a0a0a;color:#fff;font-family:'Exo 2',sans-serif;overflow:hidden;}
 
-/* BG animado */
-.bg{position:fixed;inset:0;z-index:0;}
-.bg canvas{width:100%;height:100%;}
-
-/* Partículas de estrela */
-@keyframes float{0%,100%{transform:translateY(0px) rotate(0deg);opacity:1}50%{transform:translateY(-20px) rotate(180deg);opacity:.5}}
-@keyframes pulse{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.05);opacity:1}}
-@keyframes slideIn{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:translateY(0)}}
-@keyframes glow{0%,100%{text-shadow:0 0 20px currentColor,0 0 40px currentColor}50%{text-shadow:0 0 40px currentColor,0 0 80px currentColor,0 0 120px currentColor}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow{0%,100%{text-shadow:0 0 20px currentColor,0 0 40px currentColor}50%{text-shadow:0 0 40px currentColor,0 0 80px currentColor}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-@keyframes confetti{0%{transform:translateY(-100vh) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
-@keyframes countup{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
-@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes zoomIn{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
-@keyframes rankReveal{from{opacity:0;transform:translateX(-100px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.95)}}
+@keyframes confetti{0%{transform:translateY(-10vh) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+@keyframes rankIn{from{opacity:0;transform:translateX(-80px)}to{opacity:1;transform:translateX(0)}}
+@keyframes crownBounce{0%,100%{transform:translateX(-50%) translateY(0) rotate(-5deg)}50%{transform:translateX(-50%) translateY(-10px) rotate(5deg)}}
+@keyframes shimmer{0%{opacity:.5}50%{opacity:1}100%{opacity:.5}}
 
-#app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
+canvas#bg{position:fixed;inset:0;z-index:0;}
+#app{position:relative;z-index:1;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;}
 
 /* LOADING */
 #loading{text-align:center;}
-.loader-ring{width:80px;height:80px;border:4px solid rgba(255,255,255,.1);border-top:4px solid #ffd700;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 24px;}
-.loader-text{font-family:'Orbitron',monospace;font-size:14px;color:#ffd700;letter-spacing:3px;}
+.spinner{width:64px;height:64px;border:3px solid rgba(255,215,0,.15);border-top:3px solid #ffd700;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px;}
+.load-txt{font-family:'Orbitron',monospace;font-size:12px;color:#ffd700;letter-spacing:3px;animation:pulse 1.5s infinite;}
 
 /* HEADER */
-.header{text-align:center;margin-bottom:32px;animation:slideIn .8s ease;}
-.header-badge{font-family:'Special Elite',serif;font-size:11px;letter-spacing:5px;color:#ffd700;border:1px solid rgba(255,215,0,.4);padding:5px 18px;border-radius:1px;margin-bottom:16px;display:inline-block;}
-.header-title{font-family:'Orbitron',monospace;font-size:clamp(24px,5vw,52px);font-weight:900;color:#fff;line-height:1.1;animation:glow 3s ease-in-out infinite;}
-.header-title span{color:#ffd700;}
-.header-sub{font-family:'Exo 2',sans-serif;font-size:clamp(12px,2vw,18px);color:rgba(255,255,255,.5);letter-spacing:3px;margin-top:8px;}
+.header{text-align:center;margin-bottom:20px;animation:fadeIn .7s ease;}
+.badge{font-family:'Special Elite',serif;font-size:10px;letter-spacing:4px;color:#ffd700;border:1px solid rgba(255,215,0,.35);padding:4px 16px;display:inline-block;margin-bottom:10px;}
+.main-title{font-family:'Orbitron',monospace;font-size:clamp(20px,4vw,42px);font-weight:900;color:#fff;line-height:1.1;animation:glow 3s ease-in-out infinite;}
+.main-title span{color:#ffd700;}
+.sub{font-size:clamp(10px,1.5vw,14px);color:rgba(255,255,255,.4);letter-spacing:3px;margin-top:6px;}
 
-/* PODIUM */
-.podium-wrap{display:flex;align-items:flex-end;justify-content:center;gap:16px;margin-bottom:32px;width:100%;max-width:1000px;}
+/* PÓDIO */
+.podium-wrap{display:flex;align-items:flex-end;justify-content:center;gap:12px;margin-bottom:16px;width:100%;max-width:900px;}
 
-.podium-card{display:flex;flex-direction:column;align-items:center;position:relative;}
+.pcard{display:flex;flex-direction:column;align-items:center;position:relative;}
+.pcard.p1{animation:fadeIn .5s ease .1s both;}
+.pcard.p2{animation:fadeIn .5s ease .3s both;}
+.pcard.p3{animation:fadeIn .5s ease .5s both;}
 
-/* 1º lugar */
-.podium-card.p1 .podium-block{height:200px;width:260px;background:linear-gradient(180deg,rgba(255,215,0,.25) 0%,rgba(255,215,0,.08) 100%);border:2px solid #ffd700;border-bottom:none;box-shadow:0 0 40px rgba(255,215,0,.3),inset 0 1px 0 rgba(255,215,0,.2);}
-.podium-card.p2 .podium-block{height:150px;width:220px;background:linear-gradient(180deg,rgba(192,192,192,.2) 0%,rgba(192,192,192,.06) 100%);border:2px solid #c0c0c0;border-bottom:none;box-shadow:0 0 25px rgba(192,192,192,.2);}
-.podium-card.p3 .podium-block{height:110px;width:200px;background:linear-gradient(180deg,rgba(205,127,50,.2) 0%,rgba(205,127,50,.06) 100%);border:2px solid #cd7f32;border-bottom:none;box-shadow:0 0 20px rgba(205,127,50,.2);}
+.pblock{display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-weight:900;}
+.p1 .pblock{height:clamp(120px,18vh,180px);width:clamp(200px,26vw,260px);background:linear-gradient(180deg,rgba(255,215,0,.2),rgba(255,215,0,.05));border:2px solid #ffd700;border-bottom:none;box-shadow:0 0 40px rgba(255,215,0,.25);font-size:clamp(32px,5vw,56px);color:#ffd700;}
+.p2 .pblock{height:clamp(90px,13vh,140px);width:clamp(170px,22vw,220px);background:linear-gradient(180deg,rgba(192,192,192,.18),rgba(192,192,192,.04));border:2px solid #c0c0c0;border-bottom:none;box-shadow:0 0 25px rgba(192,192,192,.18);font-size:clamp(26px,4vw,44px);color:#c0c0c0;}
+.p3 .pblock{height:clamp(70px,10vh,110px);width:clamp(150px,19vw,190px);background:linear-gradient(180deg,rgba(205,127,50,.18),rgba(205,127,50,.04));border:2px solid #cd7f32;border-bottom:none;box-shadow:0 0 18px rgba(205,127,50,.18);font-size:clamp(22px,3.5vw,38px);color:#cd7f32;}
 
-.podium-block{display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:clamp(28px,4vw,48px);font-weight:900;}
-.podium-card.p1 .podium-block{font-size:clamp(36px,5vw,64px);}
+.pinfo{text-align:center;padding:10px 8px;width:100%;}
+.p1 .pinfo{animation:bounce 2s ease-in-out infinite;}
 
-.player-card{padding:16px;text-align:center;width:100%;}
-.player-card.p1{animation:bounce 2s ease-in-out infinite;}
+.crown{position:absolute;top:clamp(-36px,-5vh,-28px);left:50%;transform:translateX(-50%);font-size:clamp(24px,3.5vw,36px);animation:crownBounce 2s ease-in-out infinite;}
 
-.player-trophy{font-size:clamp(28px,4vw,48px);margin-bottom:8px;display:block;}
-.player-card.p1 .player-trophy{font-size:clamp(36px,5vw,64px);}
+.medal{font-size:clamp(22px,3.5vw,36px);display:block;margin-bottom:4px;}
+.p1 .medal{font-size:clamp(30px,4.5vw,46px);}
 
-.player-name{font-family:'Orbitron',monospace;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px;}
-.player-card.p1 .player-name{font-size:clamp(14px,2vw,22px);color:#ffd700;animation:glow 2s ease-in-out infinite;}
-.player-card.p2 .player-name{font-size:clamp(12px,1.6vw,18px);color:#c0c0c0;}
-.player-card.p3 .player-name{font-size:clamp(11px,1.4vw,16px);color:#cd7f32;}
+.pname{font-family:'Orbitron',monospace;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px;}
+.p1 .pname{font-size:clamp(12px,1.8vw,18px);color:#ffd700;animation:glow 2.5s ease-in-out infinite;}
+.p2 .pname{font-size:clamp(10px,1.5vw,15px);color:#c0c0c0;}
+.p3 .pname{font-size:clamp(9px,1.3vw,13px);color:#cd7f32;}
 
-.player-district{font-size:clamp(9px,1.2vw,13px);color:rgba(255,255,255,.4);letter-spacing:2px;margin-bottom:8px;font-family:'Special Elite',serif;}
+.pstats{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-top:6px;}
+.chip{font-family:'Orbitron',monospace;font-size:clamp(7px,.9vw,10px);padding:3px 8px;border-radius:2px;letter-spacing:.5px;}
+.p1 .chip.xp{background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.4);color:#ffd700;}
+.p1 .chip.time{background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.3);color:#00ff88;}
+.p1 .chip.acc{background:rgba(0,200,255,.08);border:1px solid rgba(0,200,255,.3);color:#00c8ff;}
+.p2 .chip.xp{background:rgba(192,192,192,.08);border:1px solid rgba(192,192,192,.3);color:#c0c0c0;}
+.p2 .chip.time{background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);color:#00ff88;}
+.p2 .chip.acc{background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.2);color:#00c8ff;}
+.p3 .chip.xp{background:rgba(205,127,50,.08);border:1px solid rgba(205,127,50,.3);color:#cd7f32;}
+.p3 .chip.time{background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.15);color:#00ff88;}
+.p3 .chip.acc{background:rgba(0,200,255,.05);border:1px solid rgba(0,200,255,.15);color:#00c8ff;}
 
-.player-stats{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
-.stat-chip{font-family:'Orbitron',monospace;font-size:clamp(8px,1vw,11px);padding:4px 10px;border-radius:2px;letter-spacing:1px;}
-.p1 .stat-chip.xp{background:rgba(255,215,0,.15);border:1px solid rgba(255,215,0,.4);color:#ffd700;}
-.p1 .stat-chip.time{background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.3);color:#00ff88;}
-.p1 .stat-chip.acc{background:rgba(0,200,255,.1);border:1px solid rgba(0,200,255,.3);color:#00c8ff;}
-.p2 .stat-chip.xp{background:rgba(192,192,192,.1);border:1px solid rgba(192,192,192,.3);color:#c0c0c0;}
-.p2 .stat-chip.time{background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);color:#00ff88;}
-.p2 .stat-chip.acc{background:rgba(0,200,255,.08);border:1px solid rgba(0,200,255,.2);color:#00c8ff;}
-.p3 .stat-chip.xp{background:rgba(205,127,50,.1);border:1px solid rgba(205,127,50,.3);color:#cd7f32;}
-.p3 .stat-chip.time{background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.15);color:#00ff88;}
-.p3 .stat-chip.acc{background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.15);color:#00c8ff;}
+/* BASE */
+.base{width:100%;max-width:900px;height:12px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.25),rgba(255,215,0,.55),rgba(255,215,0,.25),transparent);box-shadow:0 0 16px rgba(255,215,0,.25);margin-bottom:16px;}
 
-/* BASE DO PÓDIO */
-.podium-base{width:100%;max-width:1000px;height:16px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.3),rgba(255,215,0,.6),rgba(255,215,0,.3),transparent);margin-bottom:24px;box-shadow:0 0 20px rgba(255,215,0,.3);}
+/* TABELA */
+.table-wrap{width:100%;max-width:860px;animation:fadeIn .8s ease .4s both;}
+.table-label{font-family:'Special Elite',serif;font-size:9px;color:rgba(255,255,255,.3);letter-spacing:4px;text-align:center;margin-bottom:8px;}
+.trow{display:grid;grid-template-columns:36px 1fr 80px 70px 80px;gap:10px;align-items:center;padding:7px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-size:clamp(9px,1.2vw,13px);}
+.trow.thead{font-family:'Orbitron',monospace;font-size:8px;color:rgba(255,255,255,.25);letter-spacing:1px;border-bottom:1px solid rgba(255,255,255,.1);}
+.trank{font-family:'Orbitron',monospace;font-weight:700;text-align:center;}
+.tname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:rgba(255,255,255,.8);}
+.txp{color:#ffd700;font-family:'Orbitron',monospace;text-align:right;}
+.tacc{color:#00c8ff;text-align:right;}
+.ttime{color:#00ff88;font-family:'Orbitron',monospace;text-align:right;}
 
-/* TABELA COMPLETA */
-.full-table{width:100%;max-width:900px;animation:slideIn 1s ease .5s both;}
-.table-title{font-family:'Special Elite',serif;font-size:11px;color:rgba(255,255,255,.4);letter-spacing:4px;text-align:center;margin-bottom:12px;}
-.table-row{display:grid;grid-template-columns:40px 1fr 100px 80px 80px 90px;gap:12px;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.05);font-size:clamp(10px,1.4vw,14px);transition:background .2s;}
-.table-row:hover{background:rgba(255,255,255,.03);}
-.table-row.header-row{font-family:'Orbitron',monospace;font-size:9px;color:rgba(255,255,255,.3);letter-spacing:2px;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:8px;}
-.rank-num{font-family:'Orbitron',monospace;font-weight:700;text-align:center;}
-.row-email{color:rgba(255,255,255,.8);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.row-district{color:rgba(255,255,255,.4);font-size:.85em;}
-.row-xp{color:#ffd700;font-family:'Orbitron',monospace;text-align:right;}
-.row-acc{color:#00c8ff;text-align:right;}
-.row-time{color:#00ff88;font-family:'Orbitron',monospace;text-align:right;}
-
-/* EMPTY STATE */
-.empty{text-align:center;padding:60px 20px;}
-.empty-icon{font-size:64px;margin-bottom:16px;opacity:.3;}
-.empty-text{font-family:'Orbitron',monospace;font-size:14px;color:rgba(255,255,255,.3);letter-spacing:2px;}
-.empty-sub{font-size:12px;color:rgba(255,255,255,.2);margin-top:8px;}
+/* WAITING */
+.waiting{text-align:center;padding:40px 20px;}
+.wait-icon{font-size:clamp(48px,8vw,72px);margin-bottom:14px;animation:pulse 2s infinite;}
+.wait-title{font-family:'Orbitron',monospace;font-size:clamp(14px,2.5vw,22px);color:#ffd700;margin-bottom:8px;animation:glow 2s infinite;}
+.wait-sub{font-size:clamp(10px,1.4vw,14px);color:rgba(255,255,255,.3);letter-spacing:2px;}
 
 /* REFRESH */
-.refresh-bar{position:fixed;bottom:20px;right:20px;display:flex;align-items:center;gap:10px;}
-.refresh-btn{font-family:'Orbitron',monospace;font-size:9px;padding:8px 16px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);color:#ffd700;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .2s;}
-.refresh-btn:hover{background:rgba(255,215,0,.2);}
-.auto-refresh{font-size:9px;color:rgba(255,255,255,.3);font-family:'Orbitron',monospace;}
-.refresh-dot{width:6px;height:6px;border-radius:50%;background:#00ff88;animation:pulse 2s infinite;}
+.refresh-bar{position:fixed;bottom:16px;right:16px;display:flex;align-items:center;gap:8px;z-index:10;}
+.rdot{width:6px;height:6px;border-radius:50%;background:#00ff88;animation:pulse 2s infinite;}
+.rtimer{font-family:'Orbitron',monospace;font-size:8px;color:rgba(255,255,255,.3);}
+.rbtn{font-family:'Orbitron',monospace;font-size:8px;padding:6px 14px;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.25);color:#ffd700;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .2s;}
+.rbtn:hover{background:rgba(255,215,0,.18);}
 
-/* CONFETTI */
-.confetti-piece{position:fixed;width:10px;height:10px;top:-20px;animation:confetti 4s linear infinite;z-index:999;pointer-events:none;border-radius:2px;}
-
-/* NO DATA */
-.waiting{text-align:center;animation:fadeIn 1s ease;}
-.waiting-title{font-family:'Orbitron',monospace;font-size:clamp(16px,3vw,28px);color:#ffd700;margin-bottom:16px;animation:glow 2s infinite;}
-.waiting-sub{font-size:14px;color:rgba(255,255,255,.4);letter-spacing:2px;}
-
-/* CROWN */
-.crown{position:absolute;top:-40px;left:50%;transform:translateX(-50%);font-size:36px;animation:bounce 1.5s ease-in-out infinite;}
+.confetti-p{position:fixed;border-radius:2px;pointer-events:none;z-index:999;}
 </style>
 </head>
 <body>
-
-<div id="app">
-  <div id="loading">
-    <div class="loader-ring"></div>
-    <div class="loader-text">CARREGANDO RESULTADOS...</div>
-  </div>
-</div>
-
+<canvas id="bg"></canvas>
+<div id="app"><div id="loading"><div class="spinner"></div><div class="load-txt">CARREGANDO RESULTADOS...</div></div></div>
 <div class="refresh-bar">
-  <div class="refresh-dot"></div>
-  <div class="auto-refresh" id="refresh-timer">AUTO: 30s</div>
-  <button class="refresh-btn" onclick="loadData()">↺ ATUALIZAR</button>
+  <div class="rdot"></div>
+  <div class="rtimer" id="rtimer">30s</div>
+  <button class="rbtn" onclick="load()">↺ ATUALIZAR</button>
 </div>
 
 <script>
-const SHEETS_URL = "https://script.google.com/macros/s/AKfycbwGkSJo6qXv_2JaBK_bEc9J0WqUFL8AEtfY7IvUe01M3IOAX9OD0H5gg8tTO7JAlO7Huw/exec";
+// ID da planilha — extraído do link compartilhado
+const SHEET_ID = '1HaydEW4S9xRYKo6QL6oTBkn7LoAHc0bLrbqyxvkZNh0';
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Sheet1`;
 
-// Partículas de fundo
-const canvas = document.createElement('canvas');
-const bgDiv = document.createElement('div');
-bgDiv.className = 'bg';
-bgDiv.appendChild(canvas);
-document.body.insertBefore(bgDiv, document.body.firstChild);
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
-
-const particles = Array.from({length: 80}, () => ({
-  x: Math.random() * canvas.width,
-  y: Math.random() * canvas.height,
-  size: Math.random() * 2 + .5,
-  speedX: (Math.random() - .5) * .3,
-  speedY: (Math.random() - .5) * .3,
-  opacity: Math.random() * .5 + .1,
-}));
-
-function drawBG() {
-  ctx.fillStyle = '#0a0a0a';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  // Grid
-  ctx.strokeStyle = 'rgba(255,215,0,0.03)';
-  ctx.lineWidth = 1;
-  for(let x = 0; x < canvas.width; x += 60) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
-  for(let y = 0; y < canvas.height; y += 60) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
-  // Particles
-  particles.forEach(p => {
-    p.x += p.speedX; p.y += p.speedY;
-    if(p.x < 0) p.x = canvas.width; if(p.x > canvas.width) p.x = 0;
-    if(p.y < 0) p.y = canvas.height; if(p.y > canvas.height) p.y = 0;
-    ctx.fillStyle = `rgba(255,215,0,${p.opacity})`;
-    ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
+// ── BG partículas ──
+const cv = document.getElementById('bg');
+const ctx = cv.getContext('2d');
+function resize(){ cv.width=innerWidth; cv.height=innerHeight; }
+resize(); window.addEventListener('resize', resize);
+const pts = Array.from({length:70},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.5+.3,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,o:Math.random()*.4+.1}));
+function drawBG(){
+  ctx.fillStyle='#0a0a0a'; ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.strokeStyle='rgba(255,215,0,0.025)'; ctx.lineWidth=1;
+  for(let x=0;x<cv.width;x+=55){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,cv.height);ctx.stroke();}
+  for(let y=0;y<cv.height;y+=55){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cv.width,y);ctx.stroke();}
+  pts.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0)p.x=cv.width; if(p.x>cv.width)p.x=0;
+    if(p.y<0)p.y=cv.height; if(p.y>cv.height)p.y=0;
+    ctx.fillStyle=`rgba(255,215,0,${p.o})`;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
   });
   requestAnimationFrame(drawBG);
 }
 drawBG();
 
-// Confetti
-function spawnConfetti() {
-  const colors = ['#ffd700','#ff4444','#00ff88','#00d4ff','#ff8800','#ff44ff'];
-  for(let i = 0; i < 30; i++) {
-    const el = document.createElement('div');
-    el.className = 'confetti-piece';
-    el.style.cssText = `left:${Math.random()*100}vw;background:${colors[Math.floor(Math.random()*colors.length)]};animation-delay:${Math.random()*3}s;animation-duration:${3+Math.random()*3}s;width:${6+Math.random()*10}px;height:${6+Math.random()*10}px;`;
+// ── Confetti ──
+function confetti(){
+  const cols=['#ffd700','#ff4444','#00ff88','#00d4ff','#ff8800','#ff44ff','#ffffff'];
+  for(let i=0;i<40;i++){
+    const el=document.createElement('div');
+    el.className='confetti-p';
+    const size=6+Math.random()*10;
+    el.style.cssText=`left:${Math.random()*100}vw;top:-20px;width:${size}px;height:${size}px;background:${cols[Math.floor(Math.random()*cols.length)]};animation:confetti ${3+Math.random()*3}s linear ${Math.random()*2}s forwards;`;
     document.body.appendChild(el);
-    setTimeout(() => el.remove(), 6000);
+    setTimeout(()=>el.remove(),6000);
   }
 }
 
-// Auto refresh
-let countdown = 30;
-setInterval(() => {
-  countdown--;
-  document.getElementById('refresh-timer').textContent = `AUTO: ${countdown}s`;
-  if(countdown <= 0) { countdown = 30; loadData(); }
-}, 1000);
+// ── Auto refresh ──
+let cd=30;
+setInterval(()=>{
+  cd--;
+  document.getElementById('rtimer').textContent=cd+'s';
+  if(cd<=0){cd=30;load();}
+},1000);
 
-function formatTime(secs) {
-  if(!secs && secs !== 0) return '--';
-  const m = Math.floor(secs/60), s = secs%60;
-  return `${m}m${String(s).padStart(2,'0')}s`;
+function fmt(s){
+  if(!s&&s!==0)return '--';
+  return Math.floor(s/60)+'m'+String(s%60).padStart(2,'0')+'s';
 }
-
-function getEmailName(email) {
-  if(!email) return 'Analista';
+function getName(email){
+  if(!email)return 'Analista';
+  // Se não tem @, é nome direto
+  if(!email.includes('@'))return email.toUpperCase();
   return email.split('@')[0].replace(/\./g,' ').toUpperCase();
 }
 
-async function loadData() {
+// ── Lê planilha via gviz ──
+async function load(){
   try {
-    const res = await fetch(SHEETS_URL + '?action=get&t=' + Date.now());
-    const data = await res.json();
-    if(data && data.rows) renderPanel(data.rows);
-    else renderEmpty();
+    const res = await fetch(SHEET_URL+'&t='+Date.now());
+    const text = await res.text();
+    // Remove o wrapper google.visualization.Query.setResponse(...)
+    const json = JSON.parse(text.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, ''));
+    const rows = parseSheet(json);
+    render(rows);
   } catch(e) {
-    console.warn('Erro:', e);
+    console.error(e);
     renderEmpty();
   }
 }
 
-function renderEmpty() {
+function parseSheet(json){
+  const cols = json.table.cols.map(c => c.label);
+  const rows = json.table.rows.map(r => {
+    const obj = {};
+    cols.forEach((c,i) => { obj[c] = r.c[i] ? r.c[i].v : ''; });
+    return {
+      name:         String(obj['Email'] || obj['Nome'] || ''),
+      xp:           Number(obj['XP Total']) || 0,
+      totalCorrect: Number(obj['Acertos']) || 0,
+      totalAnswered:Number(obj['Total Perguntas']) || 0,
+      pct:          parseFloat(String(obj['Aproveitamento %']||'0').replace('%','')) || 0,
+      timeSeconds:  Number(obj['Tempo (seg)'] || obj['Tempo (segundos)']) || 0,
+      hasPista:     String(obj['Trouxe Pista?']).includes('Sim'),
+    };
+  }).filter(r => r.name);
+  return rows;
+}
+
+function getBest(rows){
+  // Agrupa por nome e pega melhor resultado de cada um
+  const map = {};
+  rows.forEach(r => {
+    const key = r.name.toLowerCase();
+    if(!map[key] || r.pct > map[key].pct || (r.pct === map[key].pct && r.timeSeconds < map[key].timeSeconds)) {
+      map[key] = r;
+    }
+  });
+  return Object.values(map).sort((a,b) => b.pct - a.pct || a.timeSeconds - b.timeSeconds);
+}
+
+function renderEmpty(){
   document.getElementById('app').innerHTML = `
-    <div class="header" style="animation:slideIn .8s ease;">
-      <div class="header-badge">PACK QUALITY · INVOPS BRASIL</div>
-      <div class="header-title">QUALITY<br/><span>INVESTIGATOR</span></div>
-      <div class="header-sub">PAINEL DE RESULTADOS</div>
-    </div>
-    <div class="waiting">
-      <div style="font-size:80px;margin-bottom:16px;">⏳</div>
-      <div class="waiting-title">AGUARDANDO JOGADORES...</div>
-      <div class="waiting-sub">Os resultados aparecerão aqui assim que os analistas finalizarem o jogo</div>
-      <div style="margin-top:24px;font-family:'Orbitron',monospace;font-size:10px;color:rgba(255,255,255,.2);">ATUALIZAÇÃO AUTOMÁTICA A CADA 30 SEGUNDOS</div>
-    </div>
+    <div class="header"><div class="badge">PACK QUALITY · INVOPS BRASIL</div><div class="main-title">QUALITY <span>INVESTIGATOR</span></div><div class="sub">PAINEL DE RESULTADOS AO VIVO</div></div>
+    <div class="waiting"><div class="wait-icon">⏳</div><div class="wait-title">AGUARDANDO JOGADORES...</div><div class="wait-sub">Os resultados aparecem aqui assim que os analistas finalizam</div><div style="margin-top:16px;font-family:'Orbitron',monospace;font-size:9px;color:rgba(255,255,255,.15);">ATUALIZAÇÃO AUTOMÁTICA A CADA 30 SEGUNDOS</div></div>
   `;
 }
 
-function renderPanel(rows) {
-  // rows = array de objetos com os dados
-  // Ordenar: mais acertos primeiro, em caso de empate menor tempo
-  const sorted = [...rows].sort((a, b) => {
-    const accA = parseFloat(a.pct) || 0;
-    const accB = parseFloat(b.pct) || 0;
-    if(accB !== accA) return accB - accA;
-    return (parseInt(a.timeSeconds)||9999) - (parseInt(b.timeSeconds)||9999);
-  });
+function render(allRows){
+  const ranked = getBest(allRows);
+  if(!ranked.length){ renderEmpty(); return; }
 
-  const top3 = sorted.slice(0, 3);
-  const rest = sorted.slice(3);
+  const top3 = ranked.slice(0,3);
+  const rest = ranked.slice(3);
   const medals = ['🥇','🥈','🥉'];
-  const colors = ['p1','p2','p3'];
-  const trophies = ['👑','🥈','🥉'];
-  const podiumOrder = top3.length >= 2 ? [
-    top3[1] ? {player: top3[1], rank: 1, cls:'p2'} : null,
-    top3[0] ? {player: top3[0], rank: 0, cls:'p1'} : null,
-    top3[2] ? {player: top3[2], rank: 2, cls:'p3'} : null,
-  ].filter(Boolean) : top3.map((p,i)=>({player:p,rank:i,cls:colors[i]}));
 
-  if(top3.length > 0) spawnConfetti();
+  // Ordem pódio: 2º à esq, 1º no meio, 3º à dir
+  const podiumOrder = top3.length === 1
+    ? [{p:top3[0],r:0,cls:'p1'}]
+    : top3.length === 2
+    ? [{p:top3[1],r:1,cls:'p2'},{p:top3[0],r:0,cls:'p1'}]
+    : [{p:top3[1],r:1,cls:'p2'},{p:top3[0],r:0,cls:'p1'},{p:top3[2],r:2,cls:'p3'}];
 
-  const podiumHTML = podiumOrder.map(({player, rank, cls}) => `
-    <div class="podium-card ${cls}" style="animation:rankReveal ${.3+rank*.2}s ease both;">
-      <div class="player-card ${cls}">
-        ${rank===0?'<div class="crown">👑</div>':''}
-        <div class="player-trophy">${medals[rank]}</div>
-        <div class="player-name">${getEmailName(player.email)}</div>
-        <div class="player-district">${(player.district||'').toUpperCase()}</div>
-        <div class="player-stats">
-          <div class="stat-chip xp">⚡ ${player.xp||0} XP</div>
-          <div class="stat-chip acc">🎯 ${player.pct||'0%'}</div>
-          <div class="stat-chip time">⏱ ${formatTime(parseInt(player.timeSeconds))}</div>
+  if(top3.length>0) confetti();
+
+  const podiumHTML = podiumOrder.map(({p,r,cls})=>`
+    <div class="pcard ${cls}">
+      ${r===0?'<div class="crown">👑</div>':''}
+      <div class="pinfo">
+        <span class="medal">${medals[r]}</span>
+        <div class="pname">${getName(p.name)}</div>
+        <div class="pstats">
+          <div class="chip xp">⚡${p.xp} XP</div>
+          <div class="chip acc">🎯${p.pct}%</div>
+          <div class="chip time">⏱${fmt(p.timeSeconds)}</div>
         </div>
       </div>
-      <div class="podium-block">${rank+1}º</div>
+      <div class="pblock">${r+1}º</div>
     </div>
   `).join('');
 
-  const tableRows = sorted.map((p, i) => `
-    <div class="table-row" style="animation:fadeIn ${.1*i}s ease both;">
-      <div class="rank-num" style="color:${i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'rgba(255,255,255,.3)'}">${i<3?medals[i]:i+1}</div>
-      <div>
-        <div class="row-email">${getEmailName(p.email)}</div>
-        <div class="row-district">${p.email||''}</div>
-      </div>
-      <div class="row-district" style="color:rgba(255,255,255,.4);font-size:.8em;">${p.district||''}</div>
-      <div class="row-xp">${p.xp||0}</div>
-      <div class="row-acc">${p.pct||'0%'}</div>
-      <div class="row-time">${formatTime(parseInt(p.timeSeconds))}</div>
+  const tableHTML = ranked.map((p,i)=>`
+    <div class="trow">
+      <div class="trank" style="color:${i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'rgba(255,255,255,.25)'}">${i<3?medals[i]:i+1}</div>
+      <div class="tname">${getName(p.name)}</div>
+      <div class="txp">${p.xp}</div>
+      <div class="tacc">${p.pct}%</div>
+      <div class="ttime">${fmt(p.timeSeconds)}</div>
     </div>
   `).join('');
 
   document.getElementById('app').innerHTML = `
     <div class="header">
-      <div class="header-badge">PACK QUALITY · INVOPS BRASIL</div>
-      <div class="header-title">QUALITY <span>INVESTIGATOR</span></div>
-      <div class="header-sub">🏆 TOP INVESTIGADORES — ${sorted.length} ANALISTA${sorted.length!==1?'S':''}</div>
+      <div class="badge">PACK QUALITY · INVOPS BRASIL</div>
+      <div class="main-title">QUALITY <span>INVESTIGATOR</span></div>
+      <div class="sub">🏆 TOP INVESTIGADORES — ${ranked.length} ANALISTA${ranked.length!==1?'S':''}</div>
     </div>
-
     <div class="podium-wrap">${podiumHTML}</div>
-    <div class="podium-base"></div>
-
-    ${sorted.length > 3 ? `
-    <div class="full-table">
-      <div class="table-title">— RANKING COMPLETO —</div>
-      <div class="table-row header-row">
-        <div>#</div><div>ANALISTA</div><div>DISTRITO</div>
-        <div style="text-align:right">XP</div>
-        <div style="text-align:right">ACERTOS</div>
-        <div style="text-align:right">TEMPO</div>
-      </div>
-      ${tableRows}
-    </div>` : ''}
+    <div class="base"></div>
+    ${ranked.length>3?`
+    <div class="table-wrap">
+      <div class="table-label">— RANKING COMPLETO —</div>
+      <div class="trow thead"><div>#</div><div>ANALISTA</div><div style="text-align:right">XP</div><div style="text-align:right">ACERTOS</div><div style="text-align:right">TEMPO</div></div>
+      ${tableHTML}
+    </div>`:''}
   `;
 }
 
-// Inicializar
-loadData();
+load();
 </script>
-
-<!-- Apps Script atualizado — cole este código no seu Apps Script -->
-<!--
-ATUALIZE SEU APPS SCRIPT COM ESTE CÓDIGO:
-
-function doPost(e) {
-  try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    const data = JSON.parse(e.postData.contents);
-    if (sheet.getLastRow() === 0) {
-      sheet.appendRow(['Data/Hora','Email','Distrito','XP Total','Acertos','Total Perguntas','Aproveitamento %','Tempo (seg)','Tempo Formatado','Trouxe Pista?','pct_num']);
-      sheet.getRange(1,1,1,11).setFontWeight('bold').setBackground('#c9a227').setFontColor('#000');
-    }
-    const mins = Math.floor(data.timeSeconds/60), secs = data.timeSeconds%60;
-    sheet.appendRow([new Date().toLocaleString('pt-BR'),data.email,data.district,data.xp,data.totalCorrect,data.totalAnswered,data.pct+'%',data.timeSeconds,mins+'m '+String(secs).padStart(2,'0')+'s',data.hasPista?'Sim':'Não',data.pct]);
-    return ContentService.createTextOutput(JSON.stringify({success:true})).setMimeType(ContentService.MimeType.JSON);
-  } catch(err) {
-    return ContentService.createTextOutput(JSON.stringify({success:false,error:err.message})).setMimeType(ContentService.MimeType.JSON);
-  }
-}
-
-function doGet(e) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  const data = sheet.getDataRange().getValues();
-  if (data.length <= 1) return ContentService.createTextOutput(JSON.stringify({rows:[]})).setMimeType(ContentService.MimeType.JSON);
-  const headers = data[0];
-  const rows = data.slice(1).map(row => {
-    const obj = {};
-    headers.forEach((h,i) => obj[h] = row[i]);
-    return {
-      email: obj['Email'] || '',
-      district: obj['Distrito'] || '',
-      xp: obj['XP Total'] || 0,
-      totalCorrect: obj['Acertos'] || 0,
-      totalAnswered: obj['Total Perguntas'] || 0,
-      pct: obj['Aproveitamento %'] || '0%',
-      timeSeconds: obj['Tempo (seg)'] || 0,
-      hasPista: obj['Trouxe Pista?'] === 'Sim',
-    };
-  });
-  return ContentService.createTextOutput(JSON.stringify({rows})).setMimeType(ContentService.MimeType.JSON);
-}
--->
 </body>
 </html>
