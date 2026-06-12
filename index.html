@@ -88,10 +88,28 @@ canvas#bg{position:fixed;inset:0;z-index:0;}
 <body>
 <canvas id="bg"></canvas>
 <div id="app"><div style="text-align:center"><div class="spinner"></div><div class="load-txt">CARREGANDO...</div></div></div>
+<!-- MODAL ZERAR -->
+<div id="modal-zero" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:#111;border:2px solid #ffd700;border-radius:4px;padding:2rem;max-width:360px;width:90%;text-align:center;">
+    <div style="font-size:2rem;margin-bottom:.75rem;">⚠️</div>
+    <div style="font-family:'Orbitron',monospace;font-size:13px;color:#ffd700;margin-bottom:.5rem;letter-spacing:2px;">ZERAR RODADA</div>
+    <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:1.25rem;line-height:1.7;">Esta ação apaga TODOS os resultados.<br/>Digite a senha para confirmar.</div>
+    <input id="senha-input" type="password" placeholder="Senha..." maxlength="20"
+      style="width:100%;padding:10px;background:#000;border:1px solid #555;color:#fff;font-family:'Orbitron',monospace;font-size:12px;border-radius:2px;outline:none;margin-bottom:.75rem;text-align:center;letter-spacing:3px;"
+      onkeydown="if(event.key==='Enter')confirmarZerar()"/>
+    <div id="senha-err" style="font-size:10px;color:#ff4444;min-height:14px;margin-bottom:.75rem;font-family:'Orbitron',monospace;"></div>
+    <div style="display:flex;gap:.75rem;justify-content:center;">
+      <button onclick="fecharModal()" style="font-family:'Orbitron',monospace;font-size:9px;padding:8px 18px;background:transparent;border:1px solid #555;color:#888;cursor:pointer;border-radius:2px;letter-spacing:1px;">CANCELAR</button>
+      <button onclick="confirmarZerar()" style="font-family:'Orbitron',monospace;font-size:9px;padding:8px 18px;background:rgba(255,68,68,.15);border:1px solid #ff4444;color:#ff4444;cursor:pointer;border-radius:2px;letter-spacing:1px;">✓ CONFIRMAR</button>
+    </div>
+  </div>
+</div>
+
 <div class="refresh-bar">
   <div class="rdot"></div>
   <div class="rtimer" id="rtimer">30s</div>
   <button class="rbtn" onclick="load()">↺ ATUALIZAR</button>
+  <button class="rbtn" onclick="abrirModal()" style="border-color:rgba(255,68,68,.4);color:#ff6644;">🗑 ZERAR</button>
 </div>
 <script>
 const BIN_ID='6a2c0badda38895dfeb4fb50';
@@ -196,6 +214,48 @@ function render(){
 }
 
 load();
+
+// ─── ZERAR ───
+const SENHA_ADMIN = 'quality2025';
+
+function abrirModal(){
+  document.getElementById('modal-zero').style.display='flex';
+  document.getElementById('senha-input').value='';
+  document.getElementById('senha-err').textContent='';
+  setTimeout(()=>document.getElementById('senha-input').focus(),100);
+}
+
+function fecharModal(){
+  document.getElementById('modal-zero').style.display='none';
+}
+
+async function confirmarZerar(){
+  const senha = document.getElementById('senha-input').value;
+  if(senha !== SENHA_ADMIN){
+    document.getElementById('senha-err').textContent='SENHA INCORRETA!';
+    document.getElementById('senha-input').value='';
+    return;
+  }
+  document.getElementById('senha-err').textContent='ZERANDO...';
+  try{
+    await fetch(BIN_URL,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},
+      body:JSON.stringify({resultados:[]})
+    });
+    fecharModal();
+    activeTab='geral';
+    allData=[];
+    renderEmpty();
+  }catch(e){
+    document.getElementById('senha-err').textContent='ERRO AO ZERAR. TENTE NOVAMENTE.';
+  }
+}
+
+// Fechar modal clicando fora
+document.getElementById('modal-zero').addEventListener('click',function(e){
+  if(e.target===this)fecharModal();
+});
 </script>
 </body>
 </html>
